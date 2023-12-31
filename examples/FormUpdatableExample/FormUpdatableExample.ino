@@ -18,6 +18,8 @@ FormUpdatableExample.ino  --  Update values in running code using HTML forms
 
      */
 
+
+
 #include "WiFiS3.h"
 
 #include "arduino_secrets.h"
@@ -35,10 +37,12 @@ int intValue = 0;
 int oldIntValue = 0;
 float floatValue = 0.00;
 float oldFloatValue = 0.00;
+int blinkInterval = 500;
 
 
 FormUpdatableValue iuValue(intValue, "value");
 FormUpdatableValue fuValue(floatValue, "float");
+FormUpdatableValue blValue(blinkInterval, "interval");
 
 // Examples of overriding templates to get different functionality
 //
@@ -55,6 +59,7 @@ FormUpdatableValue fuValue(floatValue, "float");
 
 void setup() {
   //Initialize serial and wait for port to open:
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   delay(500);
   Serial.println("\n\nFormUpdatableExample.ino\n\n");
@@ -78,6 +83,14 @@ void loop() {
     Serial.println(floatValue);
     oldFloatValue = floatValue;
   }
+  static unsigned long pm = millis();
+  unsigned long cm = millis();
+  if(cm - pm >= blinkInterval){
+    static uint8_t state = LOW;
+    state = 1 - state;
+    digitalWrite(LED_BUILTIN, state);
+    pm = cm;
+  }
 }
 
 
@@ -92,7 +105,7 @@ void handleClient(){
       delayMicroseconds(10);
       if (client.available()) {
         char c = client.read();
-        Serial.write(c);
+        // Serial.write(c);
         if (c == '\n') {
 
           // if the current line is blank, you got two newline characters in a row.
